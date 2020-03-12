@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     // Truong tham chieu
-    authors: [{type: mongoose.Schema.Types.ObjectId, ref: 'Author'}]
+    authors: [{type: mongoose.Schema.Types.ObjectId, ref: 'Author'}],
 });
 
 const User = mongoose.model('User', UserSchema);

@@ -14,5 +14,16 @@ router.post('/register', async (req, res) => {
         res.send(`Error: ${error}`);
     }
 });
-
+router.post('/login', async (req, res) => {
+    let {email, password} = req.body;
+    try {
+        let {error} = LoginValid(req.body);
+        if(error) res.status(404).send(error.details[0].message);
+        let tokenKey = await Login(email, password);
+        console.log(tokenKey);
+        res.send(tokenKey);
+    } catch (error) {
+        
+    }
+})
 module.exports = router;
