@@ -5,7 +5,7 @@ const BookSchema = new mongoose.Schema({
     name: {type: String, required: true},
     publishDate: {type: String, required: true},
     pageCount: {type: Number, required: true},
-    createDate: {type: Date, default: Date.now()},
+    createDate: {type: Date, default: Date.now},
     // Truong tham chieu
     comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
     author: {type: mongoose.Schema.Types.ObjectId, ref: 'Author'}
@@ -38,6 +38,24 @@ const AddBook = async (name, publishDate, pageCount, tokenKey, id) => {
     }
 }
 
+const EditBook = async (name, publishDate, pageCount, tokenKey, idAuthor, idBook) => {
+    try {
+        let signInUser = await Verify(tokenKey);
+        let author = await Author.findById(idAuthor);
+        let book = await Book.findById(idBook);
+        if(signInUser.id !== author.owner.toString()){
+            throw 'Ban ko phai chu author';
+        } else{
+            if(author.id !== book.author.toString()){
+                throw 'Day ko phai tac gia cua sach';
+            } else{
+                
+            }
+        }
+    } catch (error) {
+        throw error;
+    }
+}
 const findAuthor = async (authors, author) => {
     try {
         authors.forEach((auth) => {

@@ -2,7 +2,7 @@ const {mongoose} = require('../database/database');
 const {Verify, User} = require('./user');
 const AuthorSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    date: {type: Date, default: Date.now()},
+    date: {type: Date, default: Date.now},
     // Truong tham chieu
     books: [{type: mongoose.Schema.Types.ObjectId, ref: 'Book'}],
     comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
@@ -17,13 +17,14 @@ const AddAuthor = async (tokenKey, name) => {
         let newAuthor = new Author();
         newAuthor.name = name;
         newAuthor.owner = signInUser;
-        await newAuthor.save();
-        await signInUser.authors.push(newAuthor);
-        await signInUser.save();
+        //newAuthor.date = new Date.now();
         let foundUser = await User.find({}).populate({
             path: 'authors',
             select: ['name']
         }).exec();
+        await newAuthor.save();
+        await signInUser.authors.push(newAuthor);
+        await signInUser.save();
     } catch (error) {
         throw error;
     }
@@ -43,10 +44,13 @@ const Search = async (text) => {
 const EditAuthor = async (tokenKey, name, id) => {
     try {
         let signInUser = await Verify(tokenKey);
-        let author = await signInUser.authors.find({_id: id});
-        if(author.length > 0){
+        let author = await Author.findById(id);
+        if(signInUser.id === author.owner.toString()){
             author.name = name;
-            author.date = new Date.now();
+            let foundUser = await User.find({}).populate({
+                path: 'authors',
+                select: ['name']
+            }).exec();
             await author.save();
             await signInUser.save();
         }
