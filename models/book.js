@@ -25,6 +25,7 @@ const AddBook = async (name, publishDate, pageCount, tokenKey, id) => {
                 newBook.name = name;
                 newBook.publishDate = publishDate;
                 newBook.pageCount = pageCount;
+                newBook.author = author;
                 await newBook.save();
                 await author.books.push(newBook);
                 await author.save();
@@ -49,8 +50,33 @@ const EditBook = async (name, publishDate, pageCount, tokenKey, idAuthor, idBook
             if(author.id !== book.author.toString()){
                 throw 'Day ko phai tac gia cua sach';
             } else{
-                
+                book.name = name;
+                book.publishDate = publishDate;
+                book.pageCount = pageCount;
+                book.createDate = Date.now();
+                await book.save();
+                await author.save();
             }
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+const DeleteBook = async (tokenKey, idBook) => {
+    try {
+        let signInUser = await Verify(tokenKey);
+        if(!signInUser){
+            throw 'Khong the xoa';
+        } else{
+            let book = await Book.findById(idBook);
+            //let author = await Author.findById(book.author);
+            await Book.deleteOne({_id: idBook});
+            let author = await Author.findById(book.author.toString());
+            author.books = await author.books.filter(eachBook => {
+                return eachBook._id.toString() !== book._id.toString();
+            });
+            await author.save();
         }
     } catch (error) {
         throw error;
@@ -66,4 +92,4 @@ const findAuthor = async (authors, author) => {
     }
 }
 
-module.exports = {Book, AddBook};
+module.exports = {Book, AddBook, EditBook, DeleteBook};
